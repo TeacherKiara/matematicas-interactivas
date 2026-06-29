@@ -1,877 +1,328 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ecuaciones cuadráticas por factorización de Aspa simple</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com/3.4.1"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
-    <!-- FontAwesome para iconos modernos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f8fafc;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(30, 64, 175, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 50%),
-                linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
-            background-size: 100% 100%, 100% 100%, 20px 20px, 20px 20px;
-            overflow-x: hidden;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Muletas Matemáticas</title>
+  <style>
+    :root{
+      --azul:#2563EB;
+      --verde:#10B981;
+      --amarillo:#FBBF24;
+      --gris:#F8FAFC;
+      --texto:#1F2937;
+      --oscuro:#0F172A;
+    }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.06), 
-                        0 0 0 1px rgba(15, 23, 42, 0.02);
-        }
+    *{box-sizing:border-box;margin:0;padding:0}
 
-        /* Contenedor del Aspa Simple */
-        .aspa-board {
-            position: relative;
-            width: 320px;
-            height: 280px;
-            margin: 0 auto;
-        }
+    body{
+      font-family: Arial, sans-serif;
+      background: var(--gris);
+      color: var(--texto);
+      line-height:1.6;
+    }
 
-        .aspa-node {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 3px dashed #cbd5e1;
-            background-color: #f8fafc;
-            position: absolute;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #1e293b;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.04);
-            cursor: pointer;
-        }
+    header{
+      background:white;
+      padding:18px 8%;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      box-shadow:0 4px 15px rgba(0,0,0,.06);
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
 
-        .aspa-node.drag-over {
-            border-color: #3b82f6;
-            background-color: #eff6ff;
-            transform: scale(1.12);
-            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2);
-        }
+    .logo{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:800;
+      font-size:1.5rem;
+      color:var(--azul);
+    }
 
-        .aspa-node.occupied {
-            border-style: solid;
-            border-color: #3b82f6;
-            background: #ffffff;
-            box-shadow: 0 8px 16px -4px rgba(59, 130, 246, 0.15);
-        }
+    .logo span{color:var(--verde)}
 
-        .aspa-node.correct {
-            border-color: #10b981;
-            background-color: #ecfdf5;
-            color: #065f46;
-            box-shadow: 0 8px 16px -4px rgba(16, 185, 129, 0.2);
-        }
+    nav a{
+      margin-left:24px;
+      text-decoration:none;
+      color:var(--texto);
+      font-weight:600;
+    }
 
-        .aspa-node.incorrect {
-            border-color: #ef4444;
-            background-color: #fef2f2;
-            color: #991b1b;
-            box-shadow: 0 8px 16px -4px rgba(239, 68, 68, 0.2);
-            animation: shake 0.4s ease;
-        }
+    nav a:hover{color:var(--azul)}
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-6px); }
-            75% { transform: translateX(6px); }
-        }
+    .hero{
+      min-height:70vh;
+      padding:70px 8%;
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:40px;
+      align-items:center;
+      background:linear-gradient(135deg,#DBEAFE,#ECFDF5);
+    }
 
-        /* Posiciones exactas del aspa */
-        #slot-tl { top: 15px; left: 15px; }
-        #slot-tr { top: 15px; right: 15px; }
-        #slot-bl { bottom: 15px; left: 15px; }
-        #slot-br { bottom: 15px; right: 15px; }
+    .hero h1{
+      font-size:3.5rem;
+      line-height:1.1;
+      color:#0F172A;
+      margin-bottom:20px;
+    }
 
-        /* Estilo Cápsulas Interactivas Premium */
-        .math-capsule {
-            cursor: grab;
-            user-select: none;
-            padding: 10px 22px;
-            border-radius: 9999px;
-            font-size: 1.15rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-            color: #15803d;
-            border: 2px solid #86efac;
-            box-shadow: 0 4px 10px -2px rgba(22, 163, 74, 0.1), 
-                        inset 0 -2px 0 0 rgba(22, 163, 74, 0.1);
-            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-            touch-action: none;
-        }
+    .hero h1 span{color:var(--verde)}
 
-        /* Variación para variables x */
-        .math-capsule.variable {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            color: #1d4ed8;
-            border-color: #93c5fd;
-            box-shadow: 0 4px 10px -2px rgba(29, 78, 216, 0.1), 
-                        inset 0 -2px 0 0 rgba(29, 78, 216, 0.1);
-        }
+    .hero p{
+      font-size:1.2rem;
+      max-width:560px;
+      margin-bottom:28px;
+    }
 
-        .math-capsule:hover {
-            transform: translateY(-3px) scale(1.03);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
+    .botones{
+      display:flex;
+      gap:16px;
+      flex-wrap:wrap;
+    }
 
-        .math-capsule:active {
-            cursor: grabbing;
-        }
+    .btn{
+      padding:14px 24px;
+      border-radius:999px;
+      text-decoration:none;
+      font-weight:800;
+      display:inline-block;
+    }
 
-        .math-capsule.dragging {
-            opacity: 0.3;
-            transform: scale(0.9);
-        }
+    .btn-verde{
+      background:var(--verde);
+      color:white;
+    }
 
-        /* Efecto de brillo de éxito */
-        .success-glow {
-            box-shadow: 0 0 25px 5px rgba(16, 185, 129, 0.4);
-            animation: pulse-success 1.5s infinite alternate;
-        }
+    .btn-blanco{
+      background:white;
+      color:var(--azul);
+      border:2px solid var(--azul);
+    }
 
-        @keyframes pulse-success {
-            from { box-shadow: 0 0 15px 2px rgba(16, 185, 129, 0.3); }
-            to { box-shadow: 0 0 30px 8px rgba(16, 185, 129, 0.5); }
-        }
+    .hero-card{
+      background:white;
+      border-radius:30px;
+      padding:35px;
+      text-align:center;
+      box-shadow:0 20px 40px rgba(0,0,0,.10);
+    }
 
-        /* Deslizador de Ayuda (Tutorial Drawer) */
-        #help-drawer {
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+    .hero-card .icono{
+      font-size:6rem;
+      margin-bottom:10px;
+    }
 
-        /* Custom Confetti Canvas */
-        #confetti-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 100;
-        }
-    </style>
+    section{
+      padding:60px 8%;
+    }
+
+    .titulo-seccion{
+      text-align:center;
+      font-size:2.2rem;
+      margin-bottom:35px;
+      color:#0F172A;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:24px;
+    }
+
+    .card{
+      background:white;
+      border-radius:24px;
+      padding:28px;
+      box-shadow:0 10px 25px rgba(0,0,0,.07);
+      transition:.3s;
+      border:1px solid #E5E7EB;
+    }
+
+    .card:hover{
+      transform:translateY(-6px);
+      box-shadow:0 18px 35px rgba(0,0,0,.12);
+    }
+
+    .card .emoji{
+      font-size:2.8rem;
+      margin-bottom:12px;
+    }
+
+    .card h3{
+      font-size:1.4rem;
+      margin-bottom:10px;
+      color:var(--azul);
+    }
+
+    .card p{
+      margin-bottom:18px;
+      color:#4B5563;
+    }
+
+    .card a{
+      color:white;
+      background:var(--azul);
+      text-decoration:none;
+      padding:10px 18px;
+      border-radius:999px;
+      font-weight:700;
+      display:inline-block;
+    }
+
+    .filosofia{
+      background:#EFF6FF;
+      text-align:center;
+      border-radius:30px;
+      margin:20px 8%;
+      padding:45px;
+    }
+
+    .filosofia h2{
+      color:var(--azul);
+      font-size:2rem;
+      margin-bottom:15px;
+    }
+
+    .filosofia p{
+      max-width:800px;
+      margin:auto;
+      font-size:1.1rem;
+    }
+
+    footer{
+      background:var(--oscuro);
+      color:white;
+      padding:35px 8%;
+      text-align:center;
+    }
+
+    footer span{color:var(--verde);font-weight:800}
+
+    @media(max-width:900px){
+      .hero{
+        grid-template-columns:1fr;
+        text-align:center;
+      }
+
+      .hero p{margin-left:auto;margin-right:auto}
+
+      .botones{justify-content:center}
+
+      .grid{grid-template-columns:1fr}
+
+      header{
+        flex-direction:column;
+        gap:14px;
+      }
+
+      nav a{
+        margin:0 8px;
+        font-size:.9rem;
+      }
+
+      .hero h1{font-size:2.5rem}
+    }
+  </style>
 </head>
-<body class="min-h-screen py-6 px-4 md:px-8 flex items-center justify-center">
+<body>
 
-    <!-- Canvas para efectos de Confeti -->
-    <canvas id="confetti-canvas"></canvas>
+  <header>
+    <div class="logo">🩼 Muletas <span>Matemáticas</span></div>
+    <nav>
+      <a href="#inicio">Inicio</a>
+      <a href="#actividades">Actividades</a>
+      <a href="#filosofia">Filosofía</a>
+    </nav>
+  </header>
 
-    <div class="glass-card w-full max-w-6xl p-6 md:p-8 rounded-3xl space-y-6 relative overflow-hidden">
-        
-        <!-- HEADER DEL JUEGO -->
-        <header class="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-slate-100 pb-4">
-            <div class="space-y-1 text-center md:text-left">
-                <h1 class="text-xl md:text-3xl font-extrabold text-slate-800 tracking-tight flex items-center justify-center md:justify-start gap-2">
-                    <i class="fa-solid fa-calculator text-blue-600"></i>
-                    Ecuaciones cuadráticas por factorización de Aspa simple
-                </h1>
-                <p id="phrase-bar" class="text-sm md:text-base text-slate-500 italic font-medium transition-all duration-300">
-                    Cargando desafío...
-                </p>
-            </div>
-            
-            <!-- Herramientas (Ayuda, Mute) -->
-            <div class="flex items-center gap-3">
-                <button id="help-btn" class="bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold px-4 py-2 rounded-xl transition flex items-center gap-2 text-sm shadow-sm">
-                    <i class="fa-solid fa-circle-question"></i> ¿Cómo jugar?
-                </button>
-                <button id="mute-btn" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2.5 rounded-xl transition shadow-sm" title="Silenciar Sonido">
-                    <i class="fa-solid fa-volume-high" id="mute-icon"></i>
-                </button>
-            </div>
-        </header>
+  <main id="inicio">
+    <section class="hero">
+      <div>
+        <h1>Aprende matemáticas de forma <span>interactiva</span></h1>
+        <p>
+          Herramientas para pensar, no para dejar de pensar.
+          Explora, juega, practica y fortalece tu razonamiento matemático.
+        </p>
+        <div class="botones">
+          <a class="btn btn-verde" href="#actividades">Comenzar a aprender</a>
+          <a class="btn btn-blanco" href="#filosofia">¿Cómo funciona?</a>
+        </div>
+      </div>
 
-        <!-- DASHBOARD DE JUEGO -->
-        <main id="main-dashboard" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            
-            <!-- PASO 1: FACTORIZACIÓN EN CRUZ -->
-            <section class="flex flex-col justify-between space-y-6">
-                <!-- Tarjeta Ecuación -->
-                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-5 text-center relative overflow-hidden shadow-sm">
-                    <span class="absolute top-2 left-3 text-[10px] font-extrabold text-blue-500 tracking-wider uppercase">Paso 1: Factorizar</span>
-                    <div id="equation-display" class="text-3xl md:text-4xl font-extrabold text-slate-800 font-mono tracking-wide mt-2">
-                        --
-                    </div>
-                </div>
+      <div class="hero-card">
+        <div class="icono">🧠</div>
+        <h2>Piensa, explora y comprende</h2>
+        <p>Las herramientas te apoyan, pero quien camina eres tú.</p>
+      </div>
+    </section>
 
-                <!-- Tablero de Aspa -->
-                <div class="aspa-board">
-                    <!-- SVG Conector animado de la X -->
-                    <svg class="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20" viewBox="0 0 320 280">
-                        <line x1="55" y1="55" x2="265" y2="225" stroke="#2563eb" stroke-width="4" stroke-dasharray="6"/>
-                        <line x1="265" y1="55" x2="55" y2="225" stroke="#2563eb" stroke-width="4" stroke-dasharray="6"/>
-                        <circle cx="160" cy="140" r="18" fill="#f8fafc" />
-                        <text x="153" y="147" fill="#2563eb" font-family="'Space Mono'" font-size="20" font-weight="bold">×</text>
-                    </svg>
-                    
-                    <!-- Casillas de destino -->
-                    <div class="aspa-node font-mono" id="slot-tl" data-slot="tl" title="Clic para vaciar"></div>
-                    <div class="aspa-node font-mono" id="slot-tr" data-slot="tr" title="Clic para vaciar"></div>
-                    <div class="aspa-node font-mono" id="slot-bl" data-slot="bl" title="Clic para vaciar"></div>
-                    <div class="aspa-node font-mono" id="slot-br" data-slot="br" title="Clic para vaciar"></div>
-                </div>
+    <section id="actividades">
+      <h2 class="titulo-seccion">Explora por áreas</h2>
 
-                <!-- Contenedor del banco de fichas -->
-                <div class="space-y-3 bg-slate-50/60 p-4 rounded-2xl border border-slate-100">
-                    <div class="flex items-center justify-between px-1">
-                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tus Fichas</span>
-                        <span class="text-[11px] text-blue-500 font-medium">Tip: Haz clic en una ficha para posicionarla rápido</span>
-                    </div>
-                    <div id="tokens-pool" class="flex flex-wrap gap-2.5 justify-center items-center min-h-[70px]">
-                        <!-- Inyectado mediante JS -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- PASO 2: RESOLUCIÓN DE RAÍCES Y GRÁFICA -->
-            <section id="step2-container" class="opacity-30 pointer-events-none transition-all duration-500 flex flex-col justify-between space-y-6">
-                <!-- Tarjeta Ecuación Factorizada -->
-                <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 rounded-2xl p-5 text-center relative overflow-hidden shadow-sm">
-                    <span class="absolute top-2 left-3 text-[10px] font-extrabold text-emerald-600 tracking-wider uppercase">Paso 2: Raíces</span>
-                    <div id="factorized-display" class="text-2xl md:text-3xl font-bold text-emerald-800 font-mono mt-2">
-                        (x + ?)(x + ?) = 0
-                    </div>
-                </div>
-
-                <!-- Controles para ingresar raíces -->
-                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-3">
-                    <p class="text-xs md:text-sm text-slate-600 font-medium text-center">
-                        Iguala cada factor a cero y calcula los puntos de cruce con el eje X:
-                    </p>
-                    <div class="flex flex-wrap items-center justify-center gap-3">
-                        <div class="relative">
-                            <span class="absolute left-3 top-2.5 text-slate-400 font-bold font-mono">x₁=</span>
-                            <input type="text" id="root-1" placeholder="?" class="w-24 pl-10 pr-3 py-2 border border-slate-200 rounded-xl text-center font-mono font-bold text-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition">
-                        </div>
-                        <div class="relative">
-                            <span class="absolute left-3 top-2.5 text-slate-400 font-bold font-mono">x₂=</span>
-                            <input type="text" id="root-2" placeholder="?" class="w-24 pl-10 pr-3 py-2 border border-slate-200 rounded-xl text-center font-mono font-bold text-lg focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition">
-                        </div>
-                        <button id="verify-roots-btn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-xl transition shadow-md text-sm flex items-center gap-1.5">
-                            <i class="fa-solid fa-check-double"></i> Validar Raíces
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Gráfico de Coordenadas de la Parábola -->
-                <div class="space-y-2">
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Visualización de la Parábola</span>
-                    <canvas id="parabola-plot" width="500" height="220"></canvas>
-                </div>
-            </section>
-        </main>
-
-        <!-- PANTALLA DE REPORTE FINAL DE DESEMPEÑO -->
-        <section id="report-screen" class="hidden space-y-8 animate-fade-in py-6">
-            <div class="text-center space-y-3">
-                <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-4xl mx-auto shadow-sm">
-                    <i class="fa-solid fa-trophy"></i>
-                </div>
-                <h2 class="text-3xl font-extrabold text-slate-800">¡Reto Completado con Éxito!</h2>
-                <p class="text-slate-500 max-w-lg mx-auto text-sm md:text-base">
-                    Has completado los 10 niveles del Aspa Simple. Aquí tienes el reporte detallado de tu desempeño en el primer intento de cada ecuación:
-                </p>
-                <div id="final-score-badge" class="text-5xl md:text-6xl font-black text-blue-600 font-mono tracking-wider py-2">
-                    0 / 10
-                </div>
-            </div>
-            
-            <div class="overflow-x-auto rounded-2xl border border-slate-100 shadow-sm bg-white">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-50 text-slate-500 text-[11px] font-bold uppercase tracking-wider border-b border-slate-100">
-                            <th class="p-4">Nivel</th>
-                            <th class="p-4">Ecuación</th>
-                            <th class="p-4">Raíces Reales</th>
-                            <th class="p-4 text-center">Desempeño</th>
-                        </tr>
-                    </thead>
-                    <tbody id="report-rows" class="text-sm text-slate-600 divide-y divide-slate-100">
-                        <!-- Creado mediante JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="text-center pt-4">
-                <button onclick="window.location.reload()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3.5 rounded-xl transition shadow-md flex items-center gap-2 mx-auto">
-                    <i class="fa-solid fa-rotate-left"></i> Jugar de nuevo
-                </button>
-            </div>
-        </section>
-
-        <!-- FOOTER: CONTROLES DE FLUJO -->
-        <footer id="game-footer" class="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-100 pt-5">
-            <div class="flex items-center gap-3">
-                <div class="text-slate-600 font-bold text-sm bg-slate-100 px-4 py-2.5 rounded-xl border border-slate-200/50 shadow-sm">
-                    Ecuación: <span id="level-lbl" class="text-blue-600 font-mono">1 / 10</span>
-                </div>
-                <div class="text-slate-600 font-bold text-sm bg-slate-100 px-4 py-2.5 rounded-xl border border-slate-200/50 shadow-sm">
-                    Puntos: <span id="score-lbl" class="text-emerald-600 font-mono">0 / 0</span>
-                </div>
-            </div>
-            
-            <button id="next-step-btn" class="w-full sm:w-auto bg-blue-600 text-white font-bold px-8 py-3.5 rounded-xl hover:bg-blue-700 transition shadow-md disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2" disabled>
-                <span>Validar Factorización</span> <i class="fa-solid fa-arrow-right"></i>
-            </button>
-        </footer>
-    </div>
-
-    <!-- PANEL LATERAL DE TUTORIAL (HELP DRAWER) -->
-    <div id="help-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 transform translate-x-full border-l border-slate-100 p-6 overflow-y-auto flex flex-col justify-between">
-        <div class="space-y-6">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-                <h3 class="text-xl font-extrabold text-slate-800 flex items-center gap-2">
-                    <i class="fa-solid fa-graduation-cap text-blue-600"></i> ¿Cómo se factoriza?
-                </h3>
-                <button id="close-help-btn" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
-                    <i class="fa-solid fa-xmark text-xl"></i>
-                </button>
-            </div>
-
-            <!-- Paso a Paso del Aspa Simple -->
-            <div class="space-y-4 text-sm text-slate-600 leading-relaxed">
-                <p>El método de <strong>Aspa Simple</strong> te ayuda a descomponer un trinomio de la forma <math><mi>a</mi><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mi>b</mi><mi>x</mi><mo>+</mo><mi>c</mi></math> en dos binomios simples.</p>
-                
-                <div class="bg-blue-50/50 p-4 rounded-xl space-y-3 border border-blue-100/50">
-                    <h4 class="font-bold text-blue-700">1. Descompón los extremos:</h4>
-                    <p>Encuentra dos términos que multiplicados den <math><mi>a</mi><msup><mi>x</mi><mn>2</mn></msup></math> (columna izquierda) y dos números que multiplicados den <math><mi>c</mi></math> (columna derecha).</p>
-                </div>
-
-                <div class="bg-emerald-50/50 p-4 rounded-xl space-y-3 border border-emerald-100/50">
-                    <h4 class="font-bold text-emerald-700">2. Multiplicación cruzada:</h4>
-                    <p>Multiplica en aspa o cruz. Al sumar estos dos resultados, el valor obtenido <strong>debe ser exactamente igual al término del centro</strong> (<math><mi>b</mi><mi>x</mi></math>).</p>
-                </div>
-
-                <div class="bg-amber-50/50 p-4 rounded-xl space-y-3 border border-amber-100/50">
-                    <h4 class="font-bold text-amber-700">3. Encuentra las Raíces:</h4>
-                    <p>Una vez factorizado en la forma <math><mo>(</mo><msub><mi>m</mi><mn>1</mn></msub><mi>x</mi><mo>+</mo><msub><mi>n</mi><mn>1</mn></msub><mo>)</mo><mo>(</mo><msub><mi>m</mi><mn>2</mn></msub><mi>x</mi><mo>+</mo><msub><mi>n</mi><mn>2</mn></msub><mo>)</mo><mo>=</mo><mn>0</mn></math>, despeja <math><mi>x</mi></math> de cada factor cambiando de signo al moverlo al otro lado del igual.</p>
-                </div>
-            </div>
+      <div class="grid">
+        <div class="card">
+          <div class="emoji">🧩</div>
+          <h3>Álgebra</h3>
+          <p>Ecuaciones, expresiones, factorización y productos notables.</p>
+          <a href="#">Explorar</a>
         </div>
 
-        <button id="close-help-bottom-btn" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl transition mt-6 shadow-sm">
-            ¡Entendido, a jugar!
-        </button>
-    </div>
+        <div class="card">
+          <div class="emoji">📈</div>
+          <h3>Funciones</h3>
+          <p>Funciones lineales, cuadráticas, gráficas y transformaciones.</p>
+          <a href="#">Explorar</a>
+        </div>
 
-    <!-- CAPA OSCURA DETRÁS DE LA AYUDA -->
-    <div id="overlay" class="fixed top-0 left-0 w-full h-full bg-slate-900/40 z-40 hidden transition-opacity duration-300"></div>
+        <div class="card">
+          <div class="emoji">📐</div>
+          <h3>Trigonometría</h3>
+          <p>Razones trigonométricas, identidades y simplificación.</p>
+          <a href="#">Explorar</a>
+        </div>
 
-    <script>
-        // BANCO DE DATOS DE NIVELES (10 Niveles Progresivos)
-        const levels = [
-            // Niveles 1-4: a=1, signos positivos
-            { eq: "x² + 5x + 6 = 0", f: { tl:"x", bl:"x", tr:"+3", br:"+2" }, roots: [-3, -2], phrase: "¡Empezamos con fuerza! Descompón los extremos." },
-            { eq: "x² + 7x + 12 = 0", f: { tl:"x", bl:"x", tr:"+4", br:"+3" }, roots: [-4, -3], phrase: "¡Estupendo! La suma cruzada da el término del centro." },
-            { eq: "x² + 8x + 15 = 0", f: { tl:"x", bl:"x", tr:"+5", br:"+3" }, roots: [-5, -3], phrase: "¡Buen ritmo! Sigue visualizando los factores matemáticos." },
-            { eq: "x² + 6x + 8 = 0", f: { tl:"x", bl:"x", tr:"+4", br:"+2" }, roots: [-4, -2], phrase: "¡Perfecto! Prepárate para el ingreso de números negativos." },
-            // Niveles 5-7: a=1, signos mixtos
-            { eq: "x² - 2x - 8 = 0", f: { tl:"x", bl:"x", tr:"-4", br:"+2" }, roots: [4, -2], phrase: "¡Alerta con los signos! Un número negativo cambia todo." },
-            { eq: "x² - 5x + 6 = 0", f: { tl:"x", bl:"x", tr:"-3", br:"-2" }, roots: [3, 2], phrase: "Recuerda: Menos por menos da más." },
-            { eq: "x² + 2x - 15 = 0", f: { tl:"x", bl:"x", tr:"+5", br:"-3" }, roots: [-5, 3], phrase: "¡Impresionante! Domina los signos mixtos como un profesional." },
-            // Niveles 8-10: a>1 Complejos
-            { eq: "2x² + 7x + 3 = 0", f: { tl:"2x", bl:"x", tr:"+1", br:"+3" }, roots: [-0.5, -3], phrase: "¡Cuidado! Ahora la columna de las x² tiene coeficientes." },
-            { eq: "3x² + 5x + 2 = 0", f: { tl:"3x", bl:"x", tr:"+2", br:"+1" }, roots: [-0.67, -1], phrase: "Nivel 9: Realiza la multiplicación de aspa mentalmente." },
-            { eq: "2x² - 5x - 3 = 0", f: { tl:"2x", bl:"x", tr:"+1", br:"-3" }, roots: [3, -0.5], phrase: "¡El reto final! Conquista el método del aspa simple por completo." }
-        ];
+        <div class="card">
+          <div class="emoji">📊</div>
+          <h3>Estadística</h3>
+          <p>Datos, gráficos, medidas de tendencia y probabilidad.</p>
+          <a href="#">Explorar</a>
+        </div>
 
-        let levelIndex = 0;
-        let score = 0;
-        let gameStep = 1; // 1: Factorización, 2: Raíces
-        let isFirstAttempt = true; 
-        let currentDraggedValue = null;
-        let activeSlots = { tl: null, tr: null, bl: null, br: null };
-        let gameHistory = [];
-        let isMuted = false;
+        <div class="card">
+          <div class="emoji">🧮</div>
+          <h3>GeoGebra</h3>
+          <p>Exploraciones visuales y simulaciones matemáticas.</p>
+          <a href="#">Explorar</a>
+        </div>
 
-        // ELEMENTOS DE INTERFAZ
-        const slotsElements = {
-            tl: document.getElementById('slot-tl'), tr: document.getElementById('slot-tr'),
-            bl: document.getElementById('slot-bl'), br: document.getElementById('slot-br')
-        };
-        const nextStepBtn = document.getElementById('next-step-btn');
-        const step2Container = document.getElementById('step2-container');
-        const rootInput1 = document.getElementById('root-1');
-        const rootInput2 = document.getElementById('root-2');
+        <div class="card">
+          <div class="emoji">🤖</div>
+          <h3>Tutor IA</h3>
+          <p>Apoyo guiado para aprender con pistas, no solo respuestas.</p>
+          <a href="#">Consultar</a>
+        </div>
+      </div>
+    </section>
 
-        // --- SISTEMA DE AUDIO SINTETIZADO (WEB AUDIO API) ---
-        let audioCtx = null;
+    <section id="filosofia" class="filosofia">
+      <h2>¿Por qué “Muletas Matemáticas”?</h2>
+      <p>
+        Una muleta ayuda mientras desarrollas fuerza, pero no camina por ti.
+        Del mismo modo, estas actividades, herramientas digitales e inteligencia artificial
+        apoyan tu aprendizaje, pero el razonamiento sigue siendo tuyo.
+      </p>
+    </section>
+  </main>
 
-        function getAudioContext() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-            return audioCtx;
-        }
+  <footer>
+    <p>© 2026 <span>Muletas Matemáticas</span> | Creado por Teacher Kiara</p>
+  </footer>
 
-        function playSound(type) {
-            if (isMuted) return;
-            try {
-                const ctx = getAudioContext();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-
-                const now = ctx.currentTime;
-
-                if (type === 'click') {
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(600, now);
-                    osc.frequency.exponentialRampToValueAtTime(150, now + 0.1);
-                    gain.gain.setValueAtTime(0.15, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-                    osc.start(now);
-                    osc.stop(now + 0.15);
-                } else if (type === 'correct') {
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(523.25, now); // C5
-                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
-                    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
-                    gain.gain.setValueAtTime(0.12, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-                    osc.start(now);
-                    osc.stop(now + 0.4);
-                } else if (type === 'incorrect') {
-                    osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(180, now);
-                    osc.frequency.linearRampToValueAtTime(110, now + 0.25);
-                    gain.gain.setValueAtTime(0.15, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-                    osc.start(now);
-                    osc.stop(now + 0.3);
-                } else if (type === 'victory') {
-                    // Melodía triunfal corta
-                    const notes = [261.63, 329.63, 392.00, 523.25];
-                    notes.forEach((freq, idx) => {
-                        const o = ctx.createOscillator();
-                        const g = ctx.createGain();
-                        o.connect(g);
-                        g.connect(ctx.destination);
-                        o.frequency.setValueAtTime(freq, now + idx * 0.12);
-                        g.gain.setValueAtTime(0.1, now + idx * 0.12);
-                        g.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.12 + 0.2);
-                        o.start(now + idx * 0.12);
-                        o.stop(now + idx * 0.12 + 0.25);
-                    });
-                }
-            } catch (err) {
-                console.warn('Audio synthesis block or suspended: ', err);
-            }
-        }
-
-        // --- SISTEMA DE CONFETI BASADO EN CANVAS ---
-        const canvas = document.getElementById("confetti-canvas");
-        const ctx = canvas.getContext("2d");
-        let particles = [];
-        let animationFrameId = null;
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        function createConfetti() {
-            particles = [];
-            const colors = ["#2563eb", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
-            for (let i = 0; i < 110; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height - canvas.height,
-                    r: Math.random() * 6 + 4,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    dx: Math.random() * 4 - 2,
-                    dy: Math.random() * 5 + 4,
-                    tilt: Math.random() * 10 - 5
-                });
-            }
-            if (animationFrameId) cancelAnimationFrame(animationFrameId);
-            animateConfetti();
-        }
-
-        function animateConfetti() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            let active = false;
-            particles.forEach(p => {
-                p.y += p.dy;
-                p.x += p.dx;
-                p.tilt += Math.sin(p.y / 10) * 0.1;
-
-                if (p.y < canvas.height) {
-                    active = true;
-                    ctx.beginPath();
-                    ctx.lineWidth = p.r;
-                    ctx.strokeStyle = p.color;
-                    ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
-                    ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
-                    ctx.stroke();
-                }
-            });
-            if (active) {
-                animationFrameId = requestAnimationFrame(animateConfetti);
-            } else {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-            }
-        }
-
-        // --- CARGA DE NIVEL ---
-        function loadCurrentLevel() {
-            gameStep = 1;
-            isFirstAttempt = true;
-            activeSlots = { tl: null, tr: null, bl: null, br: null };
-            nextStepBtn.disabled = true;
-            nextStepBtn.innerHTML = `<span>Validar Factorización</span> <i class="fa-solid fa-arrow-right"></i>`;
-            step2Container.classList.add('opacity-30', 'pointer-events-none');
-            document.getElementById('factorized-display').innerHTML = `(x + ?)(x + ?) = 0`;
-            rootInput1.value = '';
-            rootInput2.value = '';
-
-            const levelData = levels[levelIndex];
-            document.getElementById('level-lbl').textContent = `${levelIndex + 1} / 10`;
-            document.getElementById('equation-display').textContent = levelData.eq;
-            document.getElementById('phrase-bar').textContent = levelData.phrase;
-
-            // Limpieza de casillas visuales
-            Object.keys(slotsElements).forEach(key => {
-                slotsElements[key].textContent = '';
-                slotsElements[key].className = 'aspa-node font-mono';
-            });
-
-            // Generación de fichas inteligentes
-            let pieces = [levelData.f.tl, levelData.f.bl, levelData.f.tr, levelData.f.br];
-            
-            // Distractores lógicos y matemáticos
-            let valTr = parseInt(levelData.f.tr);
-            let valBr = parseInt(levelData.f.br);
-            if (!isNaN(valTr)) pieces.push((valTr * -1 > 0 ? '+' : '') + (valTr * -1));
-            if (!isNaN(valBr)) pieces.push((valBr * -1 > 0 ? '+' : '') + (valBr * -1));
-            if (!pieces.includes('2x')) pieces.push('2x');
-            if (levelIndex >= 7 && !pieces.includes('3x')) pieces.push('3x');
-
-            // Barajar las fichas resultantes
-            pieces.sort(() => Math.random() - 0.5);
-
-            const pool = document.getElementById('tokens-pool');
-            pool.innerHTML = '';
-            pieces.forEach(val => {
-                const capsule = document.createElement('div');
-                capsule.className = `math-capsule ${val.includes('x') ? 'variable' : ''}`;
-                capsule.textContent = val;
-                capsule.draggable = true;
-
-                // Soporte para Mouse drag
-                capsule.addEventListener('dragstart', () => {
-                    currentDraggedValue = val;
-                    capsule.classList.add('dragging');
-                });
-                capsule.addEventListener('dragend', () => {
-                    capsule.classList.remove('dragging');
-                });
-
-                // Clic rápido alternativo para dispositivos móviles o agilidad
-                capsule.addEventListener('click', () => {
-                    playSound('click');
-                    const targetKey = val.includes('x') ? (activeSlots.tl ? 'bl' : 'tl') : (activeSlots.tr ? 'br' : 'tr');
-                    if (!activeSlots[targetKey]) {
-                        insertInSlot(targetKey, val);
-                    }
-                });
-
-                pool.appendChild(capsule);
-            });
-
-            plotCoordinates(levelData, false);
-        }
-
-        // --- CONTROLADORES DE EVENTOS EN CASILLAS ---
-        Object.keys(slotsElements).forEach(key => {
-            const el = slotsElements[key];
-            el.addEventListener('dragover', (e) => e.preventDefault());
-            el.addEventListener('dragenter', () => el.classList.add('drag-over'));
-            el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
-            el.addEventListener('drop', () => {
-                el.classList.remove('drag-over');
-                if (currentDraggedValue) {
-                    insertInSlot(key, currentDraggedValue);
-                }
-            });
-
-            // Clic para limpiar la casilla individual
-            el.addEventListener('click', () => {
-                if (activeSlots[key]) {
-                    playSound('click');
-                    el.textContent = '';
-                    el.className = 'aspa-node font-mono';
-                    activeSlots[key] = null;
-                    nextStepBtn.disabled = true;
-                }
-            });
-        });
-
-        function insertInSlot(key, val) {
-            playSound('click');
-            activeSlots[key] = val;
-            slotsElements[key].textContent = val;
-            slotsElements[key].classList.add('occupied');
-
-            // Validar si los 4 están llenos para habilitar validación
-            if (activeSlots.tl && activeSlots.tr && activeSlots.bl && activeSlots.br) {
-                nextStepBtn.disabled = false;
-            }
-        }
-
-        // --- SISTEMA DE VALIDACIÓN ---
-        nextStepBtn.addEventListener('click', () => {
-            const levelData = levels[levelIndex];
-            
-            if (gameStep === 1) {
-                // Validación estricta del Aspa Simple en el orden cruzado
-                const correctSet = (activeSlots.tl === levelData.f.tl && activeSlots.bl === levelData.f.bl && activeSlots.tr === levelData.f.tr && activeSlots.br === levelData.f.br) ||
-                                   (activeSlots.tl === levelData.f.bl && activeSlots.bl === levelData.f.tl && activeSlots.tr === levelData.f.br && activeSlots.br === levelData.f.tr);
-
-                if (correctSet) {
-                    playSound('correct');
-                    Object.keys(slotsElements).forEach(k => slotsElements[k].className = 'aspa-node font-mono correct');
-                    
-                    // Renderizar factorización elegante
-                    document.getElementById('factorized-display').innerHTML = 
-                        `(${levelData.f.tl} ${levelData.f.tr})(${levelData.f.bl} ${levelData.f.br}) = 0`;
-
-                    step2Container.classList.remove('opacity-30', 'pointer-events-none');
-                    gameStep = 2;
-                    nextStepBtn.innerHTML = `<span>Siguiente Nivel</span> <i class="fa-solid fa-arrow-right"></i>`;
-                    nextStepBtn.disabled = true; // Requiere ingresar raíces
-                    document.getElementById('phrase-bar').textContent = "¡Increíble! Ahora calcula los puntos raíces del plano cartesiano.";
-                } else {
-                    playSound('incorrect');
-                    Object.keys(slotsElements).forEach(k => {
-                        slotsElements[k].className = 'aspa-node font-mono incorrect';
-                    });
-                    isFirstAttempt = false;
-                    document.getElementById('phrase-bar').textContent = "❌ No coincide la multiplicación o los factores de los extremos. ¡Revisa con atención!";
-                }
-            } else if (gameStep === 2) {
-                // Registrar analítica y avanzar
-                gameHistory.push({ eq: levelData.eq, roots: levelData.roots.join(', '), pass: isFirstAttempt });
-                if (isFirstAttempt) {
-                    score++;
-                    createConfetti();
-                }
-
-                document.getElementById('score-lbl').textContent = `${score} / ${levelIndex + 1}`;
-                levelIndex++;
-
-                if (levelIndex < levels.length) {
-                    loadCurrentLevel();
-                } else {
-                    triggerFinalReport();
-                }
-            }
-        });
-
-        // --- VALIDACIÓN DE RAÍCES (PASO 2) ---
-        document.getElementById('verify-roots-btn').addEventListener('click', () => {
-            const levelData = levels[levelIndex];
-            const val1 = parseFloat(rootInput1.value);
-            const val2 = parseFloat(rootInput2.value);
-
-            if (isNaN(val1) || isNaN(val2)) {
-                playSound('incorrect');
-                document.getElementById('phrase-bar').textContent = "❌ Por favor introduce un valor numérico para cada raíz.";
-                return;
-            }
-
-            // Comparar de forma flexible con tolerancia para números racionales / decimales aproximados
-            const correctMatch = (Math.abs(val1 - levelData.roots[0]) < 0.15 && Math.abs(val2 - levelData.roots[1]) < 0.15) ||
-                                 (Math.abs(val1 - levelData.roots[1]) < 0.15 && Math.abs(val2 - levelData.roots[0]) < 0.15);
-
-            if (correctMatch) {
-                playSound('correct');
-                createConfetti();
-                document.getElementById('phrase-bar').textContent = "🎉 ¡Perfecto! La parábola cruza exactamente por tus puntos raíces.";
-                plotCoordinates(levelData, true);
-                nextStepBtn.disabled = false;
-                nextStepBtn.classList.add('success-glow');
-                setTimeout(() => nextStepBtn.classList.remove('success-glow'), 2000);
-            } else {
-                playSound('incorrect');
-                isFirstAttempt = false;
-                document.getElementById('phrase-bar').textContent = "❌ Raíces incorrectas. Recuerda igualar cada binomio a cero (ej. x+3=0 => x=-3).";
-            }
-        });
-
-        // --- DIBUJADO DE LA PARÁBOLA (DESMOS STYLE) ---
-        function plotCoordinates(levelData, highlightRoots) {
-            const canvasPlot = document.getElementById('parabola-plot');
-            const ctxPlot = canvasPlot.getContext('2d');
-            ctxPlot.clearRect(0, 0, canvasPlot.width, canvasPlot.height);
-
-            const w = canvasPlot.width;
-            const h = canvasPlot.height;
-
-            // Extraer coeficientes algebraicos para graficar
-            let coeffA = 1, coeffB = 0, coeffC = 0;
-            if (levelData.eq.startsWith('2x²')) { coeffA = 2; coeffB = 7; coeffC = 3; }
-            else if (levelData.eq.startsWith('3x²')) { coeffA = 3; coeffB = 5; coeffC = 2; }
-            else {
-                coeffA = 1;
-                coeffB = levelData.eq.includes('+ 5x') ? 5 : levelData.eq.includes('+ 7x') ? 7 : levelData.eq.includes('+ 8x') ? 8 : levelData.eq.includes('+ 6x') ? 6 : levelData.eq.includes('- 2x') ? -2 : levelData.eq.includes('- 5x') ? -5 : 2;
-                coeffC = levelData.eq.includes('+ 6') ? 6 : levelData.eq.includes('+ 12') ? 12 : levelData.eq.includes('+ 15') ? 15 : levelData.eq.includes('+ 8') ? 8 : levelData.eq.includes('- 8') ? -8 : levelData.eq.includes('- 15') ? -15 : 6;
-            }
-
-            // Dibujar rejilla / grid de fondo
-            ctxPlot.strokeStyle = '#f1f5f9';
-            ctxPlot.lineWidth = 1;
-            const gridSize = 20;
-            for (let x = 0; x < w; x += gridSize) {
-                ctxPlot.beginPath();
-                ctxPlot.moveTo(x, 0);
-                ctxPlot.lineTo(x, h);
-                ctxPlot.stroke();
-            }
-            for (let y = 0; y < h; y += gridSize) {
-                ctxPlot.beginPath();
-                ctxPlot.moveTo(0, y);
-                ctxPlot.lineTo(w, y);
-                ctxPlot.stroke();
-            }
-
-            // Eje central de coordenadas
-            ctxPlot.strokeStyle = '#94a3b8';
-            ctxPlot.lineWidth = 2;
-            ctxPlot.beginPath();
-            ctxPlot.moveTo(0, h / 2 + 35);
-            ctxPlot.lineTo(w, h / 2 + 35);
-            ctxPlot.moveTo(w / 2, 0);
-            ctxPlot.lineTo(w / 2, h);
-            ctxPlot.stroke();
-
-            // Dibujado de la curva cuadrática
-            ctxPlot.strokeStyle = '#2563eb';
-            ctxPlot.lineWidth = 3.5;
-            ctxPlot.beginPath();
-            let start = true;
-
-            for (let px = 0; px < w; px++) {
-                let x = (px - w / 2) / 30; // Factor de escala X
-                let y = coeffA * x * x + coeffB * x + coeffC;
-                let py = (h / 2 + 35) - (y * 10); // Factor de escala Y
-
-                if (py >= 0 && py <= h) {
-                    if (start) {
-                        ctxPlot.moveTo(px, py);
-                        start = false;
-                    } else {
-                        ctxPlot.lineTo(px, py);
-                    }
-                }
-            }
-            ctxPlot.stroke();
-
-            // Iluminar y marcar los puntos raíces reales del corte en eje X
-            if (highlightRoots) {
-                levelData.roots.forEach(root => {
-                    let rx = w / 2 + (root * 30);
-                    let ry = h / 2 + 35;
-
-                    ctxPlot.fillStyle = '#10b981';
-                    ctxPlot.beginPath();
-                    ctxPlot.arc(rx, ry, 8, 0, 2 * Math.PI);
-                    ctxPlot.fill();
-                    ctxPlot.strokeStyle = '#ffffff';
-                    ctxPlot.lineWidth = 2.5;
-                    ctxPlot.stroke();
-
-                    // Etiqueta del valor numérico
-                    ctxPlot.fillStyle = '#065f46';
-                    ctxPlot.font = "bold 12px 'Plus Jakarta Sans'";
-                    ctxPlot.fillText(`x=${root}`, rx - 14, ry - 14);
-                });
-            }
-        }
-
-        // --- SISTEMA DE REPORTE FINAL ---
-        function triggerFinalReport() {
-            playSound('victory');
-            document.getElementById('main-dashboard').classList.add('hidden');
-            document.getElementById('game-footer').classList.add('hidden');
-            document.getElementById('report-screen').classList.remove('hidden');
-            document.getElementById('final-score-badge').textContent = `${score} / 10`;
-
-            const rowsContainer = document.getElementById('report-rows');
-            rowsContainer.innerHTML = '';
-            gameHistory.forEach((log, index) => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50/50 transition";
-                tr.innerHTML = `
-                    <td class="p-4 font-extrabold text-slate-400">${index + 1}</td>
-                    <td class="p-4 font-mono font-bold text-slate-800">${log.eq}</td>
-                    <td class="p-4 font-mono font-bold text-blue-600">${log.roots}</td>
-                    <td class="p-4 text-center">
-                        <span class="px-3 py-1.5 rounded-full text-xs font-extrabold ${log.pass ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-slate-100 text-slate-500 border border-slate-200'}">
-                            ${log.pass ? '✓✓ Al primer intento' : '✗ Intentos adicionales'}
-                        </span>
-                    </td>
-                `;
-                rowsContainer.appendChild(tr);
-            });
-        }
-
-        // --- GESTIÓN DE SONIDO SILENCIADO ---
-        document.getElementById('mute-btn').addEventListener('click', () => {
-            isMuted = !isMuted;
-            const icon = document.getElementById('mute-icon');
-            if (isMuted) {
-                icon.className = 'fa-solid fa-volume-xmark';
-                icon.parentElement.classList.add('bg-red-50', 'text-red-600');
-            } else {
-                icon.className = 'fa-solid fa-volume-high';
-                icon.parentElement.classList.remove('bg-red-50', 'text-red-600');
-            }
-        });
-
-        // --- CONTROLES DE TUTORIAL / AYUDA ---
-        const helpDrawer = document.getElementById('help-drawer');
-        const overlay = document.getElementById('overlay');
-
-        document.getElementById('help-btn').addEventListener('click', () => {
-            getAudioContext(); // Forzar el inicio de audio tras la interacción del usuario
-            helpDrawer.classList.remove('translate-x-full');
-            overlay.classList.remove('hidden');
-        });
-
-        function closeHelp() {
-            helpDrawer.classList.add('translate-x-full');
-            overlay.classList.add('hidden');
-        }
-
-        document.getElementById('close-help-btn').addEventListener('click', closeHelp);
-        document.getElementById('close-help-bottom-btn').addEventListener('click', closeHelp);
-        overlay.addEventListener('click', closeHelp);
-
-        // Inicializar el juego por primera vez
-        loadCurrentLevel();
-    </script>
 </body>
 </html>
