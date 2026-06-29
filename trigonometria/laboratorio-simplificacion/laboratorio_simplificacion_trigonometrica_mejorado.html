@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muletas Matemáticas | Laboratorio de Simplificación Trigonométrica</title>
+    <!-- Tailwind CSS para diseño moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: radial-gradient(circle, #1e1b4b 0%, #0f172a 100%);
+        }
+        .title-font {
+            font-family: 'Fredoka', sans-serif;
+        }
+        /* Estilo para las fracciones matemáticas limpias y responsivas */
+        .math-frac {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            padding: 0 4px;
+        }
+        .math-num {
+            border-bottom: 2px solid currentColor;
+            width: 100%;
+            text-align: center;
+            padding-bottom: 2px;
+        }
+        .math-den {
+            width: 100%;
+            text-align: center;
+            padding-top: 2px;
+        }
+        /* Animaciones para transiciones */
+        .pop-effect {
+            animation: pop 0.3s ease-out;
+        }
+        @keyframes pop {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-100 flex flex-col justify-between p-4 sm:p-6 overflow-x-hidden">
+
+    <!-- CABECERA DEL JUEGO -->
+    <header class="max-w-5xl w-full mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-800/80 backdrop-blur border border-slate-700 p-4 rounded-2xl shadow-xl">
+        <div class="flex items-center gap-3">
+            <div class="bg-indigo-600 p-3 rounded-xl text-yellow-300 shadow-lg shadow-indigo-500/30">
+                <i class="fa-solid fa-wand-magic-sparkles text-2xl"></i>
+            </div>
+            <div>
+                <h1 class="title-font text-2xl font-bold tracking-wide bg-gradient-to-r from-yellow-300 to-amber-400 bg-clip-text text-transparent">Muletas Matemáticas</h1>
+                <p class="text-xs text-indigo-300 font-medium">Laboratorio de Simplificación Trigonométrica</p>
+            </div>
+        </div>
+
+        <a href="../../" class="text-xs sm:text-sm font-bold bg-emerald-500 hover:bg-emerald-400 text-white px-4 py-2 rounded-xl transition shadow-md flex items-center gap-2">
+            <i class="fa-solid fa-house"></i> Volver al inicio
+        </a>
+
+        <!-- Indicadores de Progreso -->
+        <div class="flex items-center gap-6">
+            <div class="text-center">
+                <span class="text-xs text-slate-400 block uppercase tracking-wider font-bold">Puntaje</span>
+                <span id="score-display" class="text-2xl font-black text-emerald-400 title-font">0</span>
+            </div>
+            <div class="text-center">
+                <span class="text-xs text-slate-400 block uppercase tracking-wider font-bold">Racha</span>
+                <span id="streak-display" class="text-2xl font-black text-amber-400 title-font">🔥 0</span>
+            </div>
+            <div class="text-center">
+                <span class="text-xs text-slate-400 block uppercase tracking-wider font-bold">Vidas</span>
+                <div id="lives-container" class="text-xl flex gap-1 text-rose-500 mt-1">
+                    <i class="fa-solid fa-heart"></i>
+                    <i class="fa-solid fa-heart"></i>
+                    <i class="fa-solid fa-heart"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="max-w-5xl w-full mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 my-6 items-stretch flex-grow">
+        
+        <!-- PANEL DE JUEGO (Izquierda y Centro - 2 Columnas) -->
+        <section class="lg:col-span-2 flex flex-col gap-6">
+            
+            <!-- TARJETA DEL DESAFÍO -->
+            <div class="bg-slate-800/60 border border-slate-700/80 rounded-3xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden flex-grow shadow-2xl">
+                <!-- Barra de progreso del nivel -->
+                <div class="absolute top-0 left-0 right-0 h-1.5 bg-slate-700">
+                    <div id="level-progress-bar" class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500" style="width: 20%;"></div>
+                </div>
+
+                <!-- Info superior del nivel -->
+                <div class="flex justify-between items-center mb-6">
+                    <span id="level-title" class="px-4 py-1.5 rounded-full bg-indigo-500/20 text-indigo-300 text-sm font-bold border border-indigo-500/30">
+                        Nivel 1: El Despertar del Seno
+                    </span>
+                    <span id="step-indicator" class="text-sm font-bold text-slate-400">Paso 1 de 2</span>
+                </div>
+
+                <!-- Contenedor de la Expresión actual -->
+                <div class="flex flex-col items-center justify-center py-6 my-auto min-h-[160px] text-center">
+                    <p class="text-xs uppercase tracking-widest text-slate-400 mb-4 font-bold">Expresión a Simplificar:</p>
+                    <div id="expression-box" class="text-3xl sm:text-4xl md:text-5xl font-semibold text-white tracking-wide select-none pop-effect flex items-center justify-center gap-2">
+                        <!-- Se renderiza vía JS -->
+                    </div>
+                </div>
+
+                <!-- Botón de consulta al Oráculo de IA -->
+                <div class="flex justify-center mb-4">
+                    <button onclick="askOracle()" class="px-4 py-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-xl text-xs font-bold transition duration-200 shadow-md shadow-indigo-900/40 flex items-center gap-2 border border-violet-400/30">
+                        <i class="fa-solid fa-sparkles text-yellow-300 animate-pulse"></i> ✨ Pedir pista al Tutor IA
+                    </button>
+                </div>
+
+                <!-- Mensaje de Feedback -->
+                <div id="feedback-message" class="text-center py-3 px-4 rounded-xl text-sm font-medium opacity-0 transition-all duration-300 scale-95">
+                    ¡Excelente transformación!
+                </div>
+            </div>
+
+            <!-- ÁREA DE DECISIONES / OPCIONES -->
+            <div class="bg-slate-800/40 border border-slate-700/60 rounded-3xl p-6 shadow-xl">
+                <h3 id="instruction-text" class="text-base font-bold text-slate-300 mb-4 text-center">
+                    ¿Cuál es el siguiente paso correcto para simplificar la expresión?
+                </h3>
+                
+                <!-- Rejilla de opciones de respuesta -->
+                <div id="options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Botones de opción generados dinámicamente -->
+                </div>
+            </div>
+
+        </section>
+
+        <!-- PANEL LATERAL: COFRE DE FÓRMULAS Y LABORATORIO IA -->
+        <aside class="bg-slate-800/80 border border-slate-700 rounded-3xl p-6 flex flex-col justify-between shadow-2xl gap-6">
+            <div class="space-y-6">
+                <!-- SECCIÓN 1: LABORATORIO DE IA (NUEVO) -->
+                <div class="bg-slate-900/60 p-4 rounded-2xl border border-violet-500/30">
+                    <div class="flex items-center gap-2 mb-3 pb-2 border-b border-violet-500/20">
+                        <i class="fa-solid fa-wand-magic-sparkles text-violet-400"></i>
+                        <h2 class="title-font text-sm font-bold text-white">✨ Tutor IA</h2>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-3">Usa esta sección como apoyo después de completar los niveles básicos.</p>
+                    <div class="space-y-2">
+                        <input id="custom-expression-input" type="text" placeholder="Ej. sen(x) * sec(x)" class="w-full bg-slate-950 border border-slate-700 p-2.5 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-violet-500 transition" />
+                        <button onclick="generateCustomLevel()" class="w-full py-2.5 bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-lg shadow-violet-900/30">
+                            <i class="fa-solid fa-gears"></i> Crear práctica personalizada
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 2: COFRE DE FÓRMULAS (Guía del estudiante) -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4 pb-3 border-b border-slate-700/60">
+                        <i class="fa-solid fa-book-bookmark text-amber-400 text-base"></i>
+                        <h2 class="title-font text-sm font-bold text-white">Formulario de Identidades</h2>
+                    </div>
+
+                    <!-- Acordeón/Lista de Fórmulas -->
+                    <div class="space-y-3">
+                        <!-- Cociente -->
+                        <div class="bg-slate-900/40 p-3 rounded-xl border border-slate-700/30">
+                            <span class="text-[10px] font-bold text-indigo-400 block mb-1.5 uppercase tracking-wide">Identidades de Cociente</span>
+                            <div class="space-y-1.5 text-xs">
+                                <div class="flex justify-between items-center">
+                                    <span><math><mi>tan</mi><mo>(</mo><mi>x</mi><mo>)</mo></math></span>
+                                    <span class="text-slate-400">=</span>
+                                    <div class="math-frac text-[10px]">
+                                        <span class="math-num">sen(x)</span>
+                                        <span class="math-den">cos(x)</span>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span><math><mi>cot</mi><mo>(</mo><mi>x</mi><mo>)</mo></math></span>
+                                    <span class="text-slate-400">=</span>
+                                    <div class="math-frac text-[10px]">
+                                        <span class="math-num">cos(x)</span>
+                                        <span class="math-den">sen(x)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recíprocas -->
+                        <div class="bg-slate-900/40 p-3 rounded-xl border border-slate-700/30">
+                            <span class="text-[10px] font-bold text-amber-400 block mb-1.5 uppercase tracking-wide">Identidades Recíprocas</span>
+                            <div class="space-y-1.5 text-xs">
+                                <div class="flex justify-between items-center">
+                                    <span><math><mi>csc</mi><mo>(</mo><mi>x</mi><mo>)</mo></math></span>
+                                    <span class="text-slate-400">=</span>
+                                    <div class="math-frac text-[10px]">
+                                        <span class="math-num">1</span>
+                                        <span class="math-den">sen(x)</span>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span><math><mi>sec</mi><mo>(</mo><mi>x</mi><mo>)</mo></math></span>
+                                    <span class="text-slate-400">=</span>
+                                    <div class="math-frac text-[10px]">
+                                        <span class="math-num">1</span>
+                                        <span class="math-den">cos(x)</span>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span><math><mi>cot</mi><mo>(</mo><mi>x</mi><mo>)</mo></math></span>
+                                    <span class="text-slate-400">=</span>
+                                    <div class="math-frac text-[10px]">
+                                        <span class="math-num">1</span>
+                                        <span class="math-den">tan(x)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botonera de Ayuda/Acciones -->
+            <div class="pt-4 border-t border-slate-700/60 space-y-2">
+                <button onclick="toggleHowToPlay(true)" class="w-full py-2 bg-slate-700 hover:bg-slate-600 active:bg-slate-700 rounded-xl font-bold text-xs transition duration-200 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-circle-info text-blue-400"></i> ¿Cómo jugar?
+                </button>
+                <button onclick="restartGame()" class="w-full py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 rounded-xl font-bold text-xs transition duration-200 flex items-center justify-center gap-2 border border-rose-500/20">
+                    <i class="fa-solid fa-arrow-rotate-left"></i> Reiniciar Aventura
+                </button>
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="max-w-5xl w-full mx-auto text-center mt-4 text-slate-500 text-xs flex flex-col sm:flex-row justify-between items-center gap-2 border-t border-slate-800/80 pt-4">
+        <p>&copy; 2026 Muletas Matemáticas. Herramientas para pensar, no para dejar de pensar.</p>
+        <p>Creado por Teacher Kiara para estudiantes de Matemática.</p>
+    </footer>
+
+    <!-- MODAL DE INTRODUCCIÓN / CÓMO JUGAR -->
+    <div id="how-to-play-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 p-6 sm:p-8 rounded-3xl max-w-lg w-full shadow-2xl pop-effect">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-indigo-600 text-yellow-300 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-book-open-reader"></i>
+                </div>
+                <h3 class="title-font text-2xl font-bold text-white">Guía del Laboratorio</h3>
+                <p class="text-sm text-indigo-300 mt-1">Identidades recíprocas y de cociente</p>
+            </div>
+            
+            <div class="bg-emerald-500/10 border border-emerald-400/30 rounded-2xl p-4 mb-5 text-sm text-emerald-100">
+                <p class="font-bold text-emerald-300 mb-2">🎯 Objetivo de aprendizaje</p>
+                <p>Aplicar identidades recíprocas y de cociente para simplificar expresiones trigonométricas paso a paso.</p>
+                <p class="mt-2 text-xs text-emerald-200">⏱ Tiempo estimado: 10–15 minutos.</p>
+            </div>
+
+            <div class="space-y-4 text-slate-300 text-sm mb-6 leading-relaxed">
+                <p><strong class="text-yellow-400">1. Observa la expresión:</strong> En cada nivel verás una fórmula trigonométrica que necesita ser reducida a su versión más simple.</p>
+                <p><strong class="text-yellow-400">2. Elige transformaciones:</strong> Selecciona el paso correcto para ir descomponiendo la expresión en términos de senos y cosenos (¡un truco clásico!).</p>
+                <p><strong class="text-yellow-400">3. Cancela factores:</strong> Cuando tengas términos arriba y abajo, reduce la fracción para llegar al resultado.</p>
+                <p><strong class="text-purple-400">4. Tutor IA:</strong> Puedes pedir una pista cuando necesites apoyo, sin recibir la respuesta directa.</p>
+                <p><strong class="text-emerald-400">5. Rachas:</strong> Responder correctamente de manera consecutiva aumenta tu puntaje.</p>
+            </div>
+
+            <button onclick="toggleHowToPlay(false)" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition duration-200">
+                ¡Entendido, comenzar laboratorio!
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL DE RESPUESTA DEL ORÁCULO DE IA (NUEVO) -->
+    <div id="oracle-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-800 border border-violet-500/40 p-6 sm:p-8 rounded-3xl max-w-lg w-full shadow-2xl pop-effect">
+            <div class="flex items-center gap-3 mb-4 pb-2 border-b border-slate-700">
+                <div class="bg-violet-600 p-2.5 rounded-xl text-yellow-300">
+                    <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="title-font text-lg font-bold text-white">Pista del Tutor IA</h3>
+                    <p class="text-xs text-violet-300">Guía didáctica matemática</p>
+                </div>
+            </div>
+            
+            <div id="oracle-content" class="text-slate-300 text-sm leading-relaxed mb-6 whitespace-pre-line max-h-72 overflow-y-auto pr-2">
+                Generando respuesta divina...
+            </div>
+
+            <button onclick="toggleOracleModal(false)" class="w-full py-2.5 bg-violet-600 hover:bg-violet-500 text-white font-bold rounded-xl transition duration-200">
+                Volver al laboratorio
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL DE CARGA (NUEVO) -->
+    <div id="loading-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-4 hidden">
+        <div class="text-center">
+            <div class="inline-block relative w-20 h-20 mb-4">
+                <div class="absolute inset-0 rounded-full border-4 border-t-violet-500 border-r-indigo-500 border-b-transparent border-l-transparent animate-spin"></div>
+                <div class="absolute inset-2 rounded-full border-4 border-b-amber-400 border-l-pink-500 border-t-transparent border-r-transparent animate-spin duration-700"></div>
+                <div class="absolute inset-4 bg-slate-900 rounded-full flex items-center justify-center text-xl text-yellow-300">
+                    <i class="fa-solid fa-wand-magic-sparkles animate-pulse"></i>
+                </div>
+            </div>
+            <h3 class="title-font text-xl font-bold text-white">Consultando con la Inteligencia Artificial...</h3>
+            <p id="loading-subtitle" class="text-slate-400 text-sm mt-1">Conectando con el Universo de Gemini para tejer matemáticas...</p>
+        </div>
+    </div>
+
+    <!-- MODAL DE NOTIFICACIÓN DE ERROR (NUEVO) -->
+    <div id="error-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-800 border border-rose-500/40 p-6 rounded-3xl max-w-sm w-full shadow-2xl text-center">
+            <div class="w-12 h-12 bg-rose-500/20 text-rose-400 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="title-font text-lg font-bold text-white mb-2">Aviso del laboratorio</h3>
+            <p id="error-modal-message" class="text-slate-300 text-sm mb-6">Hubo un problema al conectar con el servidor de IA.</p>
+            <button onclick="closeErrorModal()" class="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl transition duration-200">
+                Aceptar
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL DE FIN DE JUEGO (Éxito o Derrota) -->
+    <div id="end-game-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-800 border border-slate-700 p-8 rounded-3xl max-w-md w-full shadow-2xl pop-effect text-center">
+            <div id="end-icon-container" class="w-20 h-20 rounded-full flex items-center justify-center text-4xl mx-auto mb-6">
+                <!-- Icono dinámico -->
+            </div>
+            
+            <h2 id="end-title" class="title-font text-3xl font-bold mb-2">¡Completado!</h2>
+            <p id="end-subtitle" class="text-slate-400 text-sm mb-6">Mensaje descriptivo del desempeño</p>
+
+            <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-700/60 mb-6 space-y-3">
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-slate-400">Puntaje Final:</span>
+                    <span id="end-score" class="font-bold text-xl text-emerald-400 title-font">1500 pts</span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-slate-400">Máxima Racha:</span>
+                    <span id="end-streak" class="font-bold text-xl text-amber-400 title-font">🔥 5</span>
+                </div>
+            </div>
+
+            <button onclick="restartGame()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition duration-200 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-play"></i> Jugar de nuevo
+            </button>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE LÓGICA DE JUEGO -->
+    <script>
+        // CONFIGURACIÓN DE LOS NIVELES (Estructura de pasos guiada didácticamente)
+        const initialLevels = [
+            {
+                title: "Nivel 1: El Despertar del Seno",
+                target: "csc(x) · sen(x)",
+                steps: [
+                    {
+                        instruction: "Paso 1: Reemplaza la cosecante csc(x) por su identidad recíproca",
+                        options: [
+                            { html: `<div class="math-frac"><span>1</span><span class="math-num"></span><span class="math-den">sen(x)</span></div> · sen(x)`, correct: true, feedback: "¡Perfecto! csc(x) es el recíproco del seno." },
+                            { html: `<div class="math-frac"><span>1</span><span class="math-num"></span><span class="math-den">cos(x)</span></div> · sen(x)`, correct: false, feedback: "Cuidado. 1/cos(x) equivale a la secante (sec), no a la cosecante." },
+                            { html: `cos(x) · sen(x)`, correct: false, feedback: "No es correcto. La cosecante no equivale directamente al coseno." }
+                        ],
+                        newExpressionHtml: `<div class="math-frac"><span class="math-num">1</span><span class="math-den">sen(x)</span></div> · sen(x)`
+                    },
+                    {
+                        instruction: "Paso 2: Multiplica y simplifica la fracción",
+                        options: [
+                            { html: `1`, correct: true, feedback: "¡Excelente! Cualquier término multiplicado por su recíproco es igual a 1." },
+                            { html: `sen²(x)`, correct: false, feedback: "Incorrecto. Recuerda que el seno de arriba se cancela con el seno de abajo." },
+                            { html: `0`, correct: false, feedback: "Cuidado. Al cancelar términos dividiendo obtenemos 1, no 0." }
+                        ],
+                        newExpressionHtml: `1`
+                    }
+                ]
+            },
+            {
+                title: "Nivel 2: El Camino de la Tangente",
+                target: "cos(x) · tan(x)",
+                steps: [
+                    {
+                        instruction: "Paso 1: Convierte la tangente tan(x) usando su identidad de cociente",
+                        options: [
+                            { html: `cos(x) · <div class="math-frac"><span class="math-num">sen(x)</span><span class="math-den">cos(x)</span></div>`, correct: true, feedback: "¡Exacto! Tangente es Seno dividido Coseno." },
+                            { html: `cos(x) · <div class="math-frac"><span class="math-num">cos(x)</span><span class="math-den">sen(x)</span></div>`, correct: false, feedback: "Al revés, Coseno/Seno equivale a la cotangente (cot)." },
+                            { html: `cos(x) · <div class="math-frac"><span class="math-num">1</span><span class="math-den">sen(x)</span></div>`, correct: false, feedback: "No es correcto. 1/sen(x) es la cosecante." }
+                        ],
+                        newExpressionHtml: `cos(x) · <div class="math-frac"><span class="math-num">sen(x)</span><span class="math-den">cos(x)</span></div>`
+                    },
+                    {
+                        instruction: "Paso 2: Simplifica cancelando el término común",
+                        options: [
+                            { html: `sen(x)`, correct: true, feedback: "¡Sensacional! El coseno que multiplica se cancela con el coseno que divide." },
+                            { html: `cos²(x)`, correct: false, feedback: "No, los cosenos no se multiplican en este caso porque uno está en el denominador." },
+                            { html: `1`, correct: false, feedback: "No queda 1, porque el factor sen(x) sigue estando presente en el numerador." }
+                        ],
+                        newExpressionHtml: `sen(x)`
+                    }
+                ]
+            },
+            {
+                title: "Nivel 3: División Elegante",
+                target: "tan(x) / sec(x)",
+                steps: [
+                    {
+                        instruction: "Paso 1: Transforma la tangente (tan) de arriba en su forma de cociente",
+                        options: [
+                            { html: `<div class="math-frac"><span class="math-num"><div class="math-frac"><span class="math-num">sen(x)</span><span class="math-den">cos(x)</span></div></span><span class="math-den">sec(x)</span></div>`, correct: true, feedback: "¡Gran paso! Convertir a senos y cosenos es la mejor estrategia básica." },
+                            { html: `<div class="math-frac"><span class="math-num">1</span><span class="math-den">sec(x)</span></div>`, correct: false, feedback: "Incorrecto, tangente no equivale a 1 directamente." }
+                        ],
+                        newExpressionHtml: `<div class="math-frac"><span class="math-num"><div class="math-frac"><span class="math-num">sen(x)</span><span class="math-den">cos(x)</span></div></span><span class="math-den">sec(x)</span></div>`
+                    },
+                    {
+                        instruction: "Paso 2: Ahora transforma el denominador sec(x) a su forma recíproca",
+                        options: [
+                            { html: `<div class="math-frac"><span class="math-num"><div class="math-frac"><span class="math-num">sen(x)</span><span class="math-den">cos(x)</span></div></span><span class="math-den"><div class="math-frac"><span class="math-num">1</span><span class="math-den">cos(x)</span></div></span></div>`, correct: true, feedback: "¡Impecable! sec(x) es el recíproco de cos(x)." },
+                            { html: `<div class="math-frac"><span class="math-num"><div class="math-frac"><span class="math-num">sen(x)</span><span class="math-den">cos(x)</span></div></span><span class="math-den"><div class="math-frac"><span class="math-num">1</span><span class="math-den">sen(x)</span></div></span></div>`, correct: false, feedback: "Incorrecto. 1/sen(x) es la cosecante." }
+                        ],
+                        newExpressionHtml: `<div class="math-frac"><span class="math-num"><div class="math-frac"><span class="math-num">sen(x)</span><span class="math-den">cos(x)</span></div></span><span class="math-den"><div class="math-frac"><span class="math-num">1</span><span class="math-den">cos(x)</span></div></span></div>`
+                    },
+                    {
+                        instruction: "Paso 3: Aplica división de fracciones (multiplicar extremos por medios) y simplifica",
+                        options: [
+                            { html: `sen(x)`, correct: true, feedback: "¡Eres un maestro de la simplificación! El denominador común cos(x) se elimina." },
+                            { html: `<div class="math-frac"><span class="math-num">sen(x)</span><span class="math-den">cos²(x)</span></div>`, correct: false, feedback: "Revisa la división de fracciones. Los cosenos se cancelan." },
+                            { html: `cos(x)`, correct: false, feedback: "No es correcto. El numerador de la fracción resultante es sen(x)." }
+                        ],
+                        newExpressionHtml: `sen(x)`
+                    }
+                ]
+            },
+            {
+                title: "Nivel 4: El Doble Recíproco",
+                target: "cot(x) · sec(x)",
+                steps: [
+                    {
+                        instruction: "Paso 1: Transforma la cotangente cot(x) usando su identidad de cociente",
+                        options: [
+                            { html: `<div class="math-frac"><span class="math-num">cos(x)</span><span class="math-den">sen(x)</span></div> · sec(x)`, correct: true, feedback: "¡Bien hecho! La cotangente es Coseno sobre Seno." },
+                            { html: `<div class="math-frac"><span class="math-num">sen(x)</span><span class="math-den">cos(x)</span></div> · sec(x)`, correct: false, feedback: "Esa es la tangente. Recuerda que la cotangente es su inversa." }
+                        ],
+                        newExpressionHtml: `<div class="math-frac"><span class="math-num">cos(x)</span><span class="math-den">sen(x)</span></div> · sec(x)`
+                    },
+                    {
+                        instruction: "Paso 2: Transforma la secante sec(x) a su forma recíproca",
+                        options: [
+                            { html: `<div class="math-frac"><span class="math-num">cos(x)</span><span class="math-den">sen(x)</span></div> · <div class="math-frac"><span class="math-num">1</span><span class="math-den">cos(x)</span></div>`, correct: true, feedback: "¡Excelente! Secante es 1 sobre Coseno." },
+                            { html: `<div class="math-frac"><span class="math-num">cos(x)</span><span class="math-den">sen(x)</span></div> · <div class="math-frac"><span class="math-num">1</span><span class="math-den">sen(x)</span></div>`, correct: false, feedback: "No, 1/sen(x) es la cosecante." }
+                        ],
+                        newExpressionHtml: `<div class="math-frac"><span class="math-num">cos(x)</span><span class="math-den">sen(x)</span></div> · <div class="math-frac"><span class="math-num">1</span><span class="math-den">cos(x)</span></div>`
+                    },
+                    {
+                        instruction: "Paso 3: Cancela los factores comunes",
+                        options: [
+                            { html: `<div class="math-frac"><span class="math-num">1</span><span class="math-den">sen(x)</span></div>`, correct: true, feedback: "¡Impecable! Los factores cos(x) arriba y abajo se eliminan." },
+                            { html: `<div class="math-frac"><span class="math-num">cos²(x)</span><span class="math-den">sen(x)</span></div>`, correct: false, feedback: "¡No! Un coseno está multiplicando y el otro dividiendo, se cancelan." }
+                        ],
+                        newExpressionHtml: `<div class="math-frac"><span class="math-num">1</span><span class="math-den">sen(x)</span></div>`
+                    },
+                    {
+                        instruction: "Paso 4: Escribe la expresión en su forma más simple (una única función)",
+                        options: [
+                            { html: `csc(x)`, correct: true, feedback: "¡Espectacular! 1/sen(x) es, por definición, la cosecante." },
+                            { html: `sec(x)`, correct: false, feedback: "Cuidado, secante se asocia con el coseno." },
+                            { html: `tan(x)`, correct: false, feedback: "No, la tangente es seno sobre coseno." }
+                        ],
+                        newExpressionHtml: `csc(x)`
+                    }
+                ]
+            },
+            {
+                title: "Nivel 5: Desafío de Fracción Compuesta",
+                target: "1 / (cot(x) · sen(x))",
+                steps: [
+                    {
+                        instruction: "Paso 1: Simplifica primero el producto del denominador (cot(x) · sen(x))",
+                        options: [
+                            { html: `<div class="math-frac"><span class="math-num">1</span><span class="math-den"><div class="math-frac"><span class="math-num">cos(x)</span><span class="math-den">sen(x)</span></div> · sen(x)</span></div>`, correct: true, feedback: "¡Brillante! Has abierto el denominador transformando la cotangente." },
+                            { html: `<div class="math-frac"><span class="math-num">1</span><span class="math-den"><div class="math-frac"><span class="math-num">sen(x)</span><span class="math-den">cos(x)</span></div> · sen(x)</span></div>`, correct: false, feedback: "Revisa la identidad de la cotangente." }
+                        ],
+                        newExpressionHtml: `<div class="math-frac"><span class="math-num">1</span><span class="math-den"><div class="math-frac"><span class="math-num">cos(x)</span><span class="math-den">sen(x)</span></div> · sen(x)</span></div>`
+                    },
+                    {
+                        instruction: "Paso 2: Simplifica el denominador cancelando sen(x)",
+                        options: [
+                            { html: `<div class="math-frac"><span class="math-num">1</span><span class="math-den">cos(x)</span></div>`, correct: true, feedback: "¡Excelente reducción intermedia!" },
+                            { html: `<div class="math-frac"><span class="math-num">1</span><span class="math-den">sen(x)</span></div>`, correct: false, feedback: "Cuidado. El seno de arriba se cancela con el seno del denominador de la cotangente." }
+                        ],
+                        newExpressionHtml: `<div class="math-frac"><span class="math-num">1</span><span class="math-den">cos(x)</span></div>`
+                    },
+                    {
+                        instruction: "Paso 3: Aplica la identidad recíproca final",
+                        options: [
+                            { html: `sec(x)`, correct: true, feedback: "¡Alquimia completada con honores! Has simplificado toda la expresión." },
+                            { html: `csc(x)`, correct: false, feedback: "Cosecante es la recíproca del seno, no del coseno." }
+                        ],
+                        newExpressionHtml: `sec(x)`
+                    }
+                ]
+            }
+        ];
+
+        let levels = [...initialLevels];
+
+        // VARIABLES DE ESTADO DEL JUEGO
+        let currentLevelIndex = 0;
+        let currentStepIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let lives = 3;
+
+        // GEMINI API INTEGRATION CONSTANTS
+        const apiKey = ""; // Se inyecta en el entorno de ejecución
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+        // AUDIO CON SINTETIZADOR WEB AUDIO API (Sin archivos externos)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'success') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+                osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            } else if (type === 'error') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, audioCtx.currentTime); // A3
+                osc.frequency.setValueAtTime(147, audioCtx.currentTime + 0.15); // D3
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'victory') {
+                osc.type = 'triangle';
+                const notes = [523, 659, 783, 1046];
+                notes.forEach((freq, idx) => {
+                    const oscNote = audioCtx.createOscillator();
+                    const gainNote = audioCtx.createGain();
+                    oscNote.type = 'triangle';
+                    oscNote.frequency.value = freq;
+                    oscNote.connect(gainNote);
+                    gainNote.connect(audioCtx.destination);
+                    gainNote.gain.setValueAtTime(0.1, audioCtx.currentTime + idx * 0.1);
+                    gainNote.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + idx * 0.1 + 0.3);
+                    oscNote.start(audioCtx.currentTime + idx * 0.1);
+                    oscNote.stop(audioCtx.currentTime + idx * 0.1 + 0.3);
+                });
+            }
+        }
+
+        // ELEMENTOS DEL DOM
+        const levelTitle = document.getElementById('level-title');
+        const stepIndicator = document.getElementById('step-indicator');
+        const expressionBox = document.getElementById('expression-box');
+        const instructionText = document.getElementById('instruction-text');
+        const optionsGrid = document.getElementById('options-grid');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const scoreDisplay = document.getElementById('score-display');
+        const streakDisplay = document.getElementById('streak-display');
+        const livesContainer = document.getElementById('lives-container');
+        const progressBar = document.getElementById('level-progress-bar');
+        const modalHowToPlay = document.getElementById('how-to-play-modal');
+        const modalEndGame = document.getElementById('end-game-modal');
+        const customExpressionInput = document.getElementById('custom-expression-input');
+        const loadingModal = document.getElementById('loading-modal');
+        const loadingSubtitle = document.getElementById('loading-subtitle');
+        const oracleModal = document.getElementById('oracle-modal');
+        const oracleContent = document.getElementById('oracle-content');
+        const errorModal = document.getElementById('error-modal');
+        const errorModalMessage = document.getElementById('error-modal-message');
+
+        // INICIALIZACIÓN
+        window.onload = () => {
+            toggleHowToPlay(true);
+            loadLevel();
+        };
+
+        // LLAMADA GENERAL A GEMINI CON BACKOFF EXPONENCIAL
+        async function fetchGemini(payload) {
+            let attempt = 0;
+            const maxAttempts = 5;
+            let delay = 1000;
+
+            while (attempt < maxAttempts) {
+                try {
+                    const response = await fetch(geminiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return await response.json();
+                } catch (error) {
+                    attempt++;
+                    if (attempt >= maxAttempts) {
+                        throw error;
+                    }
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        // FUNCIÓN NUEVA: PREGUNTAR AL ORÁCULO DE IA
+        async function askOracle() {
+            if (!apiKey) {
+                oracleContent.innerText = "Pista: transforma primero las funciones trigonométricas usando el Formulario de Identidades. Busca convertir todo a sen(x) y cos(x), luego cancela factores comunes.";
+                toggleOracleModal(true);
+                return;
+            }
+            const level = levels[currentLevelIndex];
+            const step = level.steps[currentStepIndex];
+            const currentExpr = currentStepIndex === 0 ? level.target : level.steps[currentStepIndex - 1].newExpressionHtml;
+
+            showLoading(true, "Invocando al Oráculo Matemático...", "El sabio de la trigonometría está meditando sobre tu expresión actual...");
+
+            const systemPrompt = "Actúas como un profesor de matemática amigable, dinámico y especialista en didáctica de la trigonometría. Tu meta es dar una pista inteligente para resolver el paso actual del juego, sin dar la respuesta final de forma directa. Explica el concepto y anima al estudiante.";
+            const userPrompt = `Estamos en el nivel titulado "${level.title}". El objetivo es resolver este paso: "${step.instruction}". La expresión matemática en este instante es "${currentExpr}". Proporciona una pista corta (máximo 4 líneas) que sea motivadora e instructiva, usando lenguaje claro y amigable. Recuerda no dar la respuesta exacta pero guía sobre qué identidades de cociente o recíprocas aplicar.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            try {
+                const data = await fetchGemini(payload);
+                const adviceText = data.candidates?.[0]?.content?.parts?.[0]?.text || "El Oráculo está en silencio en este momento. Intenta releer las identidades en tu Formulario de Identidades.";
+                
+                showLoading(false);
+                oracleContent.innerText = adviceText;
+                toggleOracleModal(true);
+            } catch (error) {
+                showLoading(false);
+                showError("No logramos conectar con el plano del Oráculo en este momento. ¡Confía en tus dotes matemáticas!");
+            }
+        }
+
+        // FUNCIÓN NUEVA: GENERAR NIVEL PERSONALIZADO CON IA
+        async function generateCustomLevel() {
+            if (!apiKey) {
+                showError("La práctica personalizada con IA estará disponible próximamente. Por ahora completa los niveles del laboratorio.");
+                return;
+            }
+            const userInput = customExpressionInput.value.trim();
+            if (!userInput) {
+                showError("Por favor introduce una expresión matemática válida antes de invocar a la IA.");
+                return;
+            }
+
+            showLoading(true, "Tejiendo un nuevo universo de aprendizaje...", `Gemini está analizando "${userInput}" para construir un nivel de juego completo...`);
+
+            const systemPrompt = "Eres un profesor de matemáticas experto que diseña niveles interactivos para un videojuego de identidades trigonométricas. Recibirás una expresión del usuario y debes descomponerla en pasos sencillos aplicando identidades de cociente y recíprocas de manera didáctica.";
+            const userPrompt = `Crea un nivel didáctico paso a paso para simplificar la expresión: "${userInput}".
+            Debes producir exclusivamente una estructura JSON que coincida con este esquema, sin texto adicional ni formateo markdown fuera del JSON:
+            {
+              "title": "Nivel IA: Simplificación de [nombre_amigable]",
+              "target": "${userInput}",
+              "steps": [
+                {
+                  "instruction": "[Explicación de lo que se debe hacer en este paso]",
+                  "options": [
+                    { "html": "[Representación matemática en HTML para opción CORRECTA]", "correct": true, "feedback": "[Felicitación interactiva y pedagógica detallada]" },
+                    { "html": "[Representación matemática en HTML de distractor INCORRECTO]", "correct": false, "feedback": "[Explicación pedagógica de por qué este distractor está mal]" }
+                  ],
+                  "newExpressionHtml": "[La expresión matemática resultante en HTML limpio después de aplicar el paso correcto]"
+                }
+              ]
+            }
+
+            Reglas muy importantes para el diseño:
+            1. El nivel debe tener entre 2 y 3 pasos máximos.
+            2. Cada paso debe tener de 2 a 3 opciones. Exactamente una debe ser correct: true.
+            3. Los bloques HTML deben poder insertarse directamente en la interfaz. Usa la clase CSS "math-frac" para fracciones estructuradas, con clases secundarias "math-num" para numeradores y "math-den" para denominadores. Ejemplo: '<div class="math-frac"><span class="math-num">1</span><span class="math-den">sen(x)</span></div>'.
+            4. Evita usar símbolos raros fuera del estándar HTML básico. Asegúrate de que las identidades usadas sean estrictamente de cociente y recíprocas. El paso final debe dar como resultado una sola función o número sumamente simplificado.`;
+
+            // Configuración del esquema estructurado JSON requerido
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            title: { type: "STRING" },
+                            target: { type: "STRING" },
+                            steps: {
+                                type: "ARRAY",
+                                items: {
+                                    type: "OBJECT",
+                                    properties: {
+                                        instruction: { type: "STRING" },
+                                        options: {
+                                            type: "ARRAY",
+                                            items: {
+                                                type: "OBJECT",
+                                                properties: {
+                                                    html: { type: "STRING" },
+                                                    correct: { type: "BOOLEAN" },
+                                                    feedback: { type: "STRING" }
+                                                },
+                                                required: ["html", "correct", "feedback"]
+                                            }
+                                        },
+                                        newExpressionHtml: { type: "STRING" }
+                                    },
+                                    required: ["instruction", "options", "newExpressionHtml"]
+                                }
+                            }
+                        },
+                        required: ["title", "target", "steps"]
+                    }
+                }
+            };
+
+            try {
+                const data = await fetchGemini(payload);
+                const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                const newLevel = JSON.parse(responseText);
+
+                showLoading(false);
+                
+                // Agregar el nuevo nivel al inicio de la lista de niveles y cargarlo de inmediato
+                levels.push(newLevel);
+                currentLevelIndex = levels.length - 1;
+                currentStepIndex = 0;
+                customExpressionInput.value = "";
+                
+                showFeedback("¡Nivel generado con IA con éxito!", "success");
+                loadLevel();
+
+            } catch (error) {
+                showLoading(false);
+                showError("No logramos estructurar el nivel. Por favor asegúrate de haber escrito una expresión trigonométrica clásica y vuelve a intentarlo.");
+            }
+        }
+
+        // CARGAR NIVEL Y PASO ACTUAL
+        function loadLevel() {
+            const level = levels[currentLevelIndex];
+            const step = level.steps[currentStepIndex];
+
+            // Animación de aparición
+            expressionBox.classList.remove('pop-effect');
+            void expressionBox.offsetWidth; // Trigger reflow
+            expressionBox.classList.add('pop-effect');
+
+            // Actualizar textos
+            levelTitle.innerText = level.title;
+            stepIndicator.innerText = `Paso ${currentStepIndex + 1} de ${level.steps.length}`;
+            instructionText.innerText = step.instruction;
+
+            // Renderizar la expresión actual
+            if (currentStepIndex === 0) {
+                expressionBox.innerHTML = renderInitialExpression(level.target);
+            } else {
+                expressionBox.innerHTML = level.steps[currentStepIndex - 1].newExpressionHtml;
+            }
+
+            // Renderizar opciones de respuesta
+            optionsGrid.innerHTML = '';
+            step.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = "p-4 sm:p-5 bg-slate-700 hover:bg-slate-600 active:bg-slate-700/80 rounded-2xl border border-slate-600 hover:border-indigo-500 text-center text-lg font-semibold tracking-wide transition-all duration-200 shadow-md flex items-center justify-center gap-2 select-none min-h-[72px]";
+                btn.innerHTML = opt.html;
+                btn.onclick = () => handleChoice(opt, btn);
+                optionsGrid.appendChild(btn);
+            });
+
+            // Actualizar barra de progreso global
+            const totalSteps = levels.reduce((acc, l) => acc + l.steps.length, 0);
+            let stepsCompleted = 0;
+            for (let i = 0; i < currentLevelIndex; i++) {
+                stepsCompleted += levels[i].steps.length;
+            }
+            stepsCompleted += currentStepIndex;
+            const progressPercent = (stepsCompleted / totalSteps) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+        }
+
+        function renderInitialExpression(expr) {
+            return expr.replace('·', '<span class="text-indigo-400 mx-1">·</span>');
+        }
+
+        // EVENTO: SELECCIÓN DE RESPUESTA
+        function handleChoice(opt, buttonElement) {
+            const level = levels[currentLevelIndex];
+            const step = level.steps[currentStepIndex];
+
+            const buttons = optionsGrid.querySelectorAll('button');
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (opt.correct) {
+                playSound('success');
+                streak++;
+                if (streak > maxStreak) maxStreak = streak;
+                
+                const addedPoints = 100 * streak;
+                score += addedPoints;
+                
+                scoreDisplay.innerText = score;
+                streakDisplay.innerText = `🔥 ${streak}`;
+                
+                buttonElement.classList.add('bg-emerald-600', 'border-emerald-400', 'text-white');
+                showFeedback(opt.feedback, 'success');
+
+                setTimeout(() => {
+                    currentStepIndex++;
+                    if (currentStepIndex >= level.steps.length) {
+                        currentStepIndex = 0;
+                        currentLevelIndex++;
+                        if (currentLevelIndex >= levels.length) {
+                            endGame(true);
+                            return;
+                        }
+                    }
+                    loadLevel();
+                }, 2200);
+
+            } else {
+                playSound('error');
+                streak = 0;
+                lives--;
+                
+                streakDisplay.innerText = `🔥 ${streak}`;
+                updateLivesUI();
+
+                buttonElement.classList.add('bg-rose-600', 'border-rose-400', 'text-white', 'shake-effect');
+                showFeedback(opt.feedback, 'error');
+
+                setTimeout(() => {
+                    buttonElement.classList.remove('bg-rose-600', 'border-rose-400', 'shake-effect');
+                    buttons.forEach(btn => btn.disabled = false);
+                }, 1800);
+
+                if (lives <= 0) {
+                    setTimeout(() => {
+                        endGame(false);
+                    }, 1000);
+                }
+            }
+        }
+
+        // MOSTRAR RETROALIMENTACIÓN DIDÁCTICA
+        function showFeedback(msg, status) {
+            feedbackMessage.innerText = msg;
+            feedbackMessage.className = "text-center py-3 px-4 rounded-xl text-sm font-bold transition-all duration-300 scale-100 opacity-100";
+            if (status === 'success') {
+                feedbackMessage.classList.add('bg-emerald-500/20', 'text-emerald-300', 'border', 'border-emerald-500/30');
+            } else {
+                feedbackMessage.classList.add('bg-rose-500/20', 'text-rose-300', 'border', 'border-rose-500/30');
+            }
+
+            setTimeout(() => {
+                feedbackMessage.classList.remove('opacity-100', 'scale-100');
+                feedbackMessage.classList.add('opacity-0', 'scale-95');
+            }, 3000);
+        }
+
+        function updateLivesUI() {
+            livesContainer.innerHTML = '';
+            for (let i = 0; i < 3; i++) {
+                const heart = document.createElement('i');
+                if (i < lives) {
+                    heart.className = "fa-solid fa-heart pop-effect";
+                } else {
+                    heart.className = "fa-regular fa-heart text-slate-600";
+                }
+                livesContainer.appendChild(heart);
+            }
+        }
+
+        // CONTROL DE MODALES
+        function toggleHowToPlay(show) {
+            if (show) {
+                modalHowToPlay.classList.remove('hidden');
+                modalHowToPlay.classList.add('flex');
+            } else {
+                modalHowToPlay.classList.remove('flex');
+                modalHowToPlay.classList.add('hidden');
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            }
+        }
+
+        function toggleOracleModal(show) {
+            if (show) {
+                oracleModal.classList.remove('hidden');
+                oracleModal.classList.add('flex');
+            } else {
+                oracleModal.classList.remove('flex');
+                oracleModal.classList.add('hidden');
+            }
+        }
+
+        function showLoading(show, title = "Cargando...", subtitle = "Conectando con la IA...") {
+            if (show) {
+                document.querySelector('#loading-modal h3').innerText = title;
+                loadingSubtitle.innerText = subtitle;
+                loadingModal.classList.remove('hidden');
+                loadingModal.classList.add('flex');
+            } else {
+                loadingModal.classList.remove('flex');
+                loadingModal.classList.add('hidden');
+            }
+        }
+
+        function showError(msg) {
+            errorModalMessage.innerText = msg;
+            errorModal.classList.remove('hidden');
+            errorModal.classList.add('flex');
+        }
+
+        function closeErrorModal() {
+            errorModal.classList.remove('flex');
+            errorModal.classList.add('hidden');
+        }
+
+        function endGame(victory) {
+            modalEndGame.classList.remove('hidden');
+            modalEndGame.classList.add('flex');
+
+            const endIconContainer = document.getElementById('end-icon-container');
+            const endTitle = document.getElementById('end-title');
+            const endSubtitle = document.getElementById('end-subtitle');
+            const endScore = document.getElementById('end-score');
+            const endStreak = document.getElementById('end-streak');
+
+            endScore.innerText = `${score} pts`;
+            endStreak.innerText = `🔥 ${maxStreak}`;
+
+            if (victory) {
+                playSound('victory');
+                endIconContainer.className = "w-20 h-20 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 bg-emerald-500 text-white shadow-lg shadow-emerald-500/30";
+                endIconContainer.innerHTML = '<i class="fa-solid fa-trophy"></i>';
+                endTitle.innerText = "¡Maestro de la Simplificación Trigonométrica!";
+                endSubtitle.innerText = "Has completado el laboratorio aplicando identidades recíprocas y de cociente. ¡Excelente trabajo!";
+            } else {
+                endIconContainer.className = "w-20 h-20 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 bg-rose-500 text-white shadow-lg shadow-rose-500/30";
+                endIconContainer.innerHTML = '<i class="fa-solid fa-skull-crossbones"></i>';
+                endTitle.innerText = "Reintentar laboratorio";
+                endSubtitle.innerText = "Te quedaste sin vidas. Revisa el formulario de identidades e inténtalo nuevamente.";
+            }
+        }
+
+        function restartGame() {
+            levels = [...initialLevels];
+            currentLevelIndex = 0;
+            currentStepIndex = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            lives = 3;
+
+            scoreDisplay.innerText = score;
+            streakDisplay.innerText = `🔥 ${streak}`;
+            updateLivesUI();
+
+            modalEndGame.classList.add('hidden');
+            modalEndGame.classList.remove('flex');
+
+            loadLevel();
+        }
+    </script>
+</body>
+</html>
